@@ -6,13 +6,15 @@ package main
 
 import (
 	"flag"
+	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
 )
 
 type application struct {
-	logger *slog.Logger
+	logger        *slog.Logger
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -23,9 +25,15 @@ func main() {
 	// Inizialize new JSON logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
 	// Inizialize new application struct
 	app := application{
-		logger: logger,
+		logger:        logger,
+		templateCache: templateCache,
 	}
 
 	// Inizialize new customer http.Server struct
@@ -38,7 +46,7 @@ func main() {
 	logger.Info("starting server", slog.String("addr", *addr))
 
 	// Start server, log and exit if any errors
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 
 	logger.Error(err.Error())
 	os.Exit(1)
