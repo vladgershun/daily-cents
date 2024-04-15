@@ -4,11 +4,14 @@ import (
 	"net/http"
 
 	"github.com/justinas/alice"
+	"github.com/vladgershun/daily-cents/ui"
 )
 
 func (app *application) routes() http.Handler {
 	// Initialize a new multiplexer
 	mux := http.NewServeMux()
+
+	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
 	mux.HandleFunc("GET /{$}", app.home)
 	mux.HandleFunc("GET /user/signup", app.userSignUp)

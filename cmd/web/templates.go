@@ -3,10 +3,16 @@ package main
 import (
 	"html/template"
 	"io/fs"
+	"net/http"
 	"path/filepath"
 
+	"github.com/vladgershun/daily-cents/internal/models"
 	"github.com/vladgershun/daily-cents/ui"
 )
+
+type templateData struct {
+	Banks []models.Bank
+}
 
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
@@ -34,4 +40,8 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	}
 
 	return cache, nil
+}
+
+func (app *application) newTemplateData(r *http.Request) templateData {
+	return templateData{}
 }
