@@ -1,6 +1,8 @@
 package plaid
 
 import (
+	"log"
+
 	"github.com/plaid/plaid-go/v23/plaid"
 )
 
@@ -22,6 +24,14 @@ var environments = map[string]plaid.Environment{
 }
 
 func init() {
+
+	if PLAID_CLIENT_ID == "" {
+		log.Fatal("PLAID_CLIENT_ID is not set. Make sure to fill out the .env file")
+	}
+	if PLAID_SECRET == "" {
+		log.Fatal("PLAID_SECRET is not set. Make sure to fill out the .env file")
+	}
+
 	configuration := plaid.NewConfiguration()
 	configuration.AddDefaultHeader("PLAID-CLIENT-ID", PLAID_CLIENT_ID)
 	configuration.AddDefaultHeader("PLAID-SECRET", PLAID_SECRET)
