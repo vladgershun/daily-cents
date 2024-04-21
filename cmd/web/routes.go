@@ -19,6 +19,8 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /user/login", app.userLogin)
 	mux.HandleFunc("POST /user/login", app.userLoginPost)
 
+	mux.HandleFunc("GET /balance", balance)
+
 	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 
 	return standard.Then(mux)
