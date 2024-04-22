@@ -33,13 +33,9 @@ var (
 	PLAID_CLIENT_ID = ""
 	PLAID_SECRET    = ""
 	PLAID_ENV       = ""
-	// PLAID_PRODUCTS                       = ""
-	// PLAID_COUNTRY_CODES                  = ""
-	// PLAID_REDIRECT_URI                   = ""
-	// APP_PORT                             = ""
-	client      *plaid.APIClient
-	accessToken string
-	publicToken string
+	client          *plaid.APIClient
+	accessToken     string
+	publicToken     string
 )
 
 func init() {
@@ -61,12 +57,10 @@ func init() {
 	configuration.UseEnvironment(plaid.Sandbox)
 	client = plaid.NewAPIClient(configuration)
 
+	createPublicTokenSandbox()
 }
 
 func balance(w http.ResponseWriter, r *http.Request) {
-
-	createPublicTokenSandbox()
-
 	ctx := context.Background()
 
 	balancesGetResp, _, err := client.PlaidApi.AccountsBalanceGet(ctx).AccountsBalanceGetRequest(
@@ -78,7 +72,7 @@ func balance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accounts := balancesGetResp.Accounts
+	accounts := balancesGetResp.GetAccounts()
 
 	accountsJSON, err := json.Marshal(accounts)
 	if err != nil {
@@ -86,14 +80,20 @@ func balance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var balanceResp PlaidAccount
-	err = json.Unmarshal(accountsJSON, &balanceResp)
+	var accountsResp PlaidAccount
+	err = json.Unmarshal(accountsJSON, &accountsResp)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	fmt.Println(balanceResp)
+	for _, account := range accountsResp {
+		fmt.Println("---------------------------")
+		fmt.Printf("Name: %s\n", account.Name)
+		fmt.Printf("Account ID: %s\n", account.AccountID)
+		fmt.Printf("Available Balance: %d\n", account.Balances.Available)
+		fmt.Println("---------------------------")
+	}
 }
 
 func createPublicTokenSandbox() {
